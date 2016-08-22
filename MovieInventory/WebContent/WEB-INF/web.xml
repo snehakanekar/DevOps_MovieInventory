@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app
+    xmlns="http://java.sun.com/xml/ns/javaee" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    version="3.0">
+ <display-name>MovieInventory</display-name>
+  <welcome-file-list>
+    <welcome-file>AddMovie.html</welcome-file>
+  </welcome-file-list>
+  <servlet>
+    <description></description>
+    <display-name>AllMovies</display-name>
+    <servlet-name>AllMovies</servlet-name>
+    <servlet-class>main.java.com.psl.jdbc.AllMovies</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AllMovies</servlet-name>
+    <url-pattern>/AllMovies</url-pattern>
+  </servlet-mapping>
+</web-app>
