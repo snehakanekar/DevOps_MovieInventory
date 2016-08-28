@@ -15,7 +15,7 @@ class Test_Home_page(unittest.TestCase):
         self.browser = webdriver.Firefox()
 
     def testTitle(self):
-        self.browser.get('http://10.51.237.131:9001/MovieInventory/') 
+        self.browser.get('http://10.51.237.133:9001/MovieInventory/') 
 	#print(self.browser.page_source)
         self.assertIn('Add Movie Details', self.browser.title)
 
@@ -32,7 +32,7 @@ class Test_AddMovie(unittest.TestCase):
 	# Create a new instance of the Firefox driver
 	driver = webdriver.Firefox()
 
-	driver.get('http://10.51.237.131:9001/MovieInventory/') 
+	driver.get('http://10.51.237.133:9001/MovieInventory/') 
 	#print driver.title
 
 	# find the element that's name attribute is q (the google search box)
