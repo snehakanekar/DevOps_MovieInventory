@@ -19,7 +19,7 @@ public class DBUtils
     PreparedStatement ps =  null;
     
     Class.forName("com.mysql.jdbc.Driver");  
-    String url = "jdbc:mysql://10.51.237.131:6603/onlinemoviebookingsystem";
+    String url = "jdbc:mysql://10.51.237.133:6603/onlinemoviebookingsystem";
 	String username = "root";
 	//String password = "root";
 	

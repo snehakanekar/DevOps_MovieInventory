@@ -1,0 +1,52 @@
+---
+- name: Install MySQL in testdbserver container
+  hosts: "{{ host }}"
+  environment:
+    - http_proxy: "{{ http_proxy }}"
+    - https_proxy: "{{ https_proxy }}"
+
+  vars:
+    MySQL_root_pass: root
+
+  tasks:
+    - name: Set MySQL root password before installing
+      debconf: name='mysql-server' question='mysql-server/root_password' value='{{MySQL_root_pass | quote}}' vtype='password'
+    - name: Confirm MySQL root password before installing
+      debconf: name='mysql-server' question='mysql-server/root_password_again' value='{{MySQL_root_pass | quote}}' vtype='password'
+    - name: Install MySQL
+      apt: name={{ item }} state=installed force=yes update_cache=yes cache_valid_time=3600
+      with_items:
+        - mysql-server
+        - mysql-client
+        - python-mysqldb
+    - name: Copy MYSQL configuration file to remote host
+      copy: src=/var/lib/jenkins/MovieInventoryRepo/Config/my.cnf dest=/etc/mysql/my.cnf mode=0544
+    
+    - name: Start Mysql service
+      command: /usr/sbin/service mysql start 
+    - name: update mysql root password for all root accounts
+      mysql_user: 
+        name: root 
+        host: "{{ item }}" 
+        password: root
+        login_user: root
+        login_password: root
+        check_implicit_admin: yes
+        priv: "*.*:ALL,GRANT"
+      with_items:
+        - "{{ ansible_hostname }}"
+        - 127.0.0.1
+        - ::1
+        - localhost
+    - name: Copy MySql script to remote host
+      copy: src=/var/lib/jenkins/MovieInventoryRepo/Config/createdbtables.sql dest=/tmp/createdbtables.sql mode=0555
+    - name: Create database and tables
+      mysql_db: state=import name=all target=/tmp/createdbtables.sql login_user=root login_password=root
+    - name: Force mysql service restart
+      command: /usr/sbin/service mysql restart
+
+  handlers:
+    - name: Start Mysql
+      service: name=mysql state=started
+    - name: Restart MySql
+      service: name=mysql state=restarted

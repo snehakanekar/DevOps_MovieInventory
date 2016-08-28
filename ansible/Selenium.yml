@@ -1,0 +1,29 @@
+---
+- name: Install Selenium in test_env_server container
+  hosts: "{{ host }}" 
+  environment:
+    - http_proxy: "{{ http_proxy }}"
+    - https_proxy: "{{ https_proxy }}"
+
+  tasks:
+   - name: Install firefox xvfb python-pip svn
+     apt: name={{ item }} state=installed force=yes update_cache=yes cache_valid_time=3600
+     with_items:
+       - firefox
+       - python-pip
+       - subversion
+       - xvfb
+       - xfonts-100dpi
+       - xfonts-75dpi
+       - xfonts-cyrillic
+       - xorg 
+       - dbus-x11
+   - name: Install selenium
+     shell: pip install selenium
+   - name: Copy selenium script
+     copy: src=/var/lib/jenkins/MovieInventoryRepo/Testcases/selenium.sh dest=/root/selenium.sh mode=0777
+   - name: Copy testcases
+     copy: src=/var/lib/jenkins/MovieInventoryRepo/Testcases/test.py dest=/root/test.py mode=0777
+
+   - name: Export display
+     shell: /root/selenium.sh
