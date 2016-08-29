@@ -26,7 +26,26 @@ echo "[testwebserver]" >> hosts
 echo $webserverIP "ansible_ssh_pass=root" >> hosts
 echo "" >> hosts
 
-echo "[jenkinhost]" >> hosts
-echo "10.51.237.131 ansible_ssh_pass=Pspl123" >> hosts
-echo "" >> hosts
+#Retrieve the web, DB and test server's IP addresses
+managementIP=$(sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}' management_node)
+data1IP=$(sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}' data_node1)
+data2IP=$(sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}' data_node2)
+mysqlIP=$(sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}' mysql_node)
 
+echo "IP of management_node is:",$managementIP
+echo "IP of data_node1 is:",$data1IP
+echo "IP of data_node2 is:",$data2IP
+echo "IP of mysql_node is:",$mysqlIP
+
+echo "[management_node]" >> hosts
+echo $managementIP  "ansible_ssh_pass=root" >> hosts
+echo "" >> hosts
+echo "[data_node1]" >> hosts
+echo $data1IP  "ansible_ssh_pass=root" >> hosts
+echo "" >> hosts
+echo "[data_node2]" >> hosts
+echo $data2IP  "ansible_ssh_pass=root" >> hosts
+echo "" >> hosts
+echo "[mysql_node]" >> hosts
+echo $mysqlIP  "ansible_ssh_pass=root" >> hosts
+echo "" >> hosts
