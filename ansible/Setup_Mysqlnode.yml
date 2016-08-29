@@ -28,6 +28,9 @@
         - groupadd mysql
         - useradd -g mysql mysql
 
+    - name: Download Mysql cluster
+      get_url: url=http://dev.mysql.com/get/Downloads/MySQL-Cluster-7.4/mysql-cluster-gpl-7.4.12-linux-glibc2.5-x86_64.tar.gz dest=/usr/local/mysql-cluster-gpl-7.4.12-linux-glibc2.5-x86_64.tar.gz
+
     - name: Extract MySql cluster archive
       command: chdir=/usr/local/ /bin/tar xvf mysql-cluster-gpl-7.4.12-linux-glibc2.5-x86_64.tar.gz -C /usr/local/ creates=/usr/local/mysql-cluster-gpl-7.4.12-linux-glibc2.5-x86_64      
 
