@@ -1,0 +1,42 @@
+---
+- name: Start Cluster
+  hosts: '{{ managementIP }}'
+  tasks:  
+    - name: Initialize ndb_mgmd
+      command: /usr/local/bin/ndb_mgmd -f /var/lib/mysql-cluster/config.ini --initial --config-dir=/var/lib/mysql-cluster/ creates=/var/lib/mysql-cluster/ndb_1_cluster.log
+
+- name: Start Data 1 Node
+  hosts: '{{ data1IP }}'
+  tasks:  
+    - name: Start Datanode service
+      command: /usr/local/bin/ndbd
+
+- name: Start Data 2 Node
+  hosts: '{{ data2IP }}'
+  tasks:  
+    - name: Start Datanode service
+      command: /usr/local/bin/ndbd	  
+
+- name: Start MySql Node
+  hosts: '{{ mysqlIP }}'
+  tasks:
+    - name: Start Mysql service
+      command: /etc/init.d/mysql.server start
+
+    - name: update mysql root password for all root accounts
+      mysql_user: 
+        name: root 
+        password: root
+        login_user: root
+        login_password: root
+        check_implicit_admin: yes
+        priv: "*.*:ALL,GRANT"
+
+    - name: Copy MySql script to remote host
+      copy: src=/var/lib/jenkins/MovieInventoryRepo/Config/createdbtables.sql dest=/tmp/createdbtables.sql mode=0555
+
+    - name: Create database and tables
+      mysql_db: state=import name=all target=/tmp/createdbtables.sql login_user=root login_password=root
+
+    - name: Restart Sql Node
+      command: /etc/init.d/mysql.server restart

@@ -1,0 +1,22 @@
+---
+- hosts: "{{ host }}"
+  remote_user: root
+  environment:
+        http_proxy: "{{ http_proxy }}"
+        https_proxy: "{{ https_proxy }}"
+
+  tasks:
+   - name: Download Mysql cluster
+     get_url: url=http://dev.mysql.com/get/Downloads/MySQL-Cluster-7.4/mysql-cluster-gpl-7.4.12-linux-glibc2.5-x86_64.tar.gz dest=/tmp/mysql-cluster-gpl-7.4.12-linux-glibc2.5-x86_64.tar.gz
+
+   - name: Extract archive
+     command: chdir=/tmp/ /bin/tar xvf mysql-cluster-gpl-7.4.12-linux-glibc2.5-x86_64.tar.gz -C /tmp/ creates=/tmp/mysql-cluster-gpl-7.4.12-linux-glibc2.5-x86_64
+
+   - name: Copy ndb_mgm binaries 
+     copy: src=/tmp/mysql-cluster-gpl-7.4.12-linux-glibc2.5-x86_64/bin/ndbd dest=/usr/local/bin/ndbd  mode=0777 remote_src=true
+
+   - name: Create a data directory for data node
+     file: path=/usr/local/mysql/data state=directory mode=0777
+
+   - name: Copy MYSQL configuration file to remote host
+     copy: src=/etc/ansible/config/my.cnf dest=/etc/my.cnf mode=0644

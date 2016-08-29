@@ -1,0 +1,44 @@
+---
+- name: Setup Mysql node
+  hosts: "{{ host }}"
+  environment:
+    - http_proxy: "{{ http_proxy }}"
+    - https_proxy: "{{ https_proxy }}"
+
+  vars:
+    MySQL_root_pass: root
+
+  tasks:
+    - name: Install libaio1, libaio-dev and python mysqldb
+      apt: name={{ item }} state=installed force=yes update_cache=yes cache_valid_time=3600
+      with_items:
+        - libaio1
+        - libaio-dev
+        - python-mysqldb
+
+    - name: Set MySQL root password before installing
+      debconf: name='mysql-server' question='mysql-server/root_password' value='{{MySQL_root_pass | quote}}' vtype='password'
+
+    - name: Confirm MySQL root password before installing
+      debconf: name='mysql-server' question='mysql-server/root_password_again' value='{{MySQL_root_pass | quote}}' vtype='password'
+
+    - name: Create mysql group and add mysql user to group
+      command: "{{ item }}"
+      with_items:
+        - groupadd mysql
+        - useradd -g mysql mysql
+
+    - name: Extract MySql cluster archive
+      command: chdir=/usr/local/ /bin/tar xvf mysql-cluster-gpl-7.4.12-linux-glibc2.5-x86_64.tar.gz -C /usr/local/ creates=/usr/local/mysql-cluster-gpl-7.4.12-linux-glibc2.5-x86_64      
+
+    - name: Create /etc/mysql if does not exist
+      file: path=/etc/mysql state=directory mode=0755
+
+    - name: Copy MYSQL configuration file to remote host
+      copy: src=/etc/ansible/mysqlconfig/my.cnf dest=/etc/mysql/my.cnf mode=0644
+
+    - name: Edit /etc/mysql/my.conf file
+      replace: dest=/etc/mysql/my.cnf regexp='^\[mysql_cluster\]' replace='[mysql_cluster]\nndb-connectstring={{ managementIP }}'
+
+    - name: Execute script
+      script: /etc/ansible/config/sqlnodescripts.sh	  
