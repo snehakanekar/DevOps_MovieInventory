@@ -6,12 +6,12 @@ cd /etc/ansible
 
 #-------------Installing Mysql--------------------------------
 #Retrieve the db server's IP address
-dbserverIP=$(sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}' testdbserver)
-echo "IP of db server is:",$dbserverIP
+#dbserverIP=$(sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}' testdbserver)
+#echo "IP of db server is:",$dbserverIP
 
 export ANSIBLE_HOST_KEY_CHECKING=False
 
-ansible-playbook -i hosts -u root InstallMysql.yml --extra-vars "host=$dbserverIP $proxies"
+#ansible-playbook -i hosts -u root InstallMysql.yml --extra-vars "host=$dbserverIP $proxies"
 
 #---------------Installing Tomcat---------------------------------
 #Retrieve the web server's IP address
@@ -22,6 +22,7 @@ ansible-playbook -i hosts -u root InstallTomcat.yml  --extra-vars "host=$webserv
 
 #---------------Deploying war in Tomcat---------------------------
 #Deploy war in tomcat
+
 knife bootstrap $webserverIP -x root -P root -N WebServer -r 'recipe[deploy_war]' --node-ssl-verify-mode none --bootstrap-proxy http://sneha_kanekar:6LUCKIE%24%236@ptproxy.persistent.co.in:8080
 
 knife client delete WebServer -y
