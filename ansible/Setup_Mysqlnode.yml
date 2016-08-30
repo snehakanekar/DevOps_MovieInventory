@@ -38,7 +38,7 @@
       file: path=/etc/mysql state=directory mode=0755
 
     - name: Copy MYSQL configuration file to remote host
-      copy: src=/var/lib/jenkins/MovieInventoryRepo/Config/my.cnf dest=/etc/mysql/my.cnf mode=0644
+      copy: src=/etc/ansible/my.cnf dest=/etc/mysql/my.cnf mode=0644
 
     - name: Edit /etc/mysql/my.conf file
       replace: dest=/etc/mysql/my.cnf regexp='^\[mysql_cluster\]' replace='[mysql_cluster]\nndb-connectstring={{ managementIP }}'
